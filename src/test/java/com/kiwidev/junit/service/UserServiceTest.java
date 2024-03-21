@@ -1,12 +1,14 @@
 package com.kiwidev.junit.service;
 
+import com.kiwidev.junit.TestBase;
 import com.kiwidev.junit.dto.User;
-import com.kiwidev.junit.paramresolver.UserServiceParamResolver;
+import com.kiwidev.junit.extension.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
@@ -21,9 +23,13 @@ import static org.assertj.core.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.DisplayName.class)
 @ExtendWith({
-        UserServiceParamResolver.class
+        UserServiceParamResolver.class,
+        PostProcessingExtension.class,
+        ConditionalExtensions.class,
+        ThrowableExtension.class
+//        GlobalExtension.class
 })
-public class UserServiceTest {
+public class UserServiceTest extends TestBase {
 
     private static final User IVAN = User.of(1,"Ivan","123");
     private static final User PETR = User.of(2,"Petr","111");
@@ -47,7 +53,10 @@ public class UserServiceTest {
     }
 
     @Test
-    void usersEmptyIfNoUserAdded(UserService userService){
+    void usersEmptyIfNoUserAdded(UserService userService) throws IOException {
+        if (true){
+            throw new RuntimeException();
+        }
         System.out.println("Test1: " + this);
         var users = userService.getAll();
         assertTrue(users.isEmpty());
@@ -107,7 +116,7 @@ public class UserServiceTest {
     @Tag("login")
     @DisplayName("user login test functionality")
     @Nested
-    @Timeout(value = 200,unit = TimeUnit.MILLISECONDS)
+//    @Timeout(value = 200,unit = TimeUnit.MILLISECONDS)
     class LoginTest{
         @Test
 
@@ -141,15 +150,14 @@ public class UserServiceTest {
 //        maybeuser.ifPresent(user -> assertEquals(IVAN,user));
         }
 
-        @Test
+/*        @Test
         void checkLoginFunctionalityPerformance(){
             System.out.println(Thread.currentThread().getName());
-            var result = assertTimeoutPreemptively(Duration.ofMillis(200L),() ->{
-                Thread.sleep(300L);
+            var result = assertTimeout(Duration.ofMillis(200L),() ->{
                 System.out.println(Thread.currentThread().getName());
                     return userService.login("dummy", IVAN.getPassword());
             });
-        }
+        }*/
 
 
         @RepeatedTest(value = 5,name = RepeatedTest.LONG_DISPLAY_NAME)

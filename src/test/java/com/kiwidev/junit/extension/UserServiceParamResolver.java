@@ -1,7 +1,6 @@
-package com.kiwidev.junit.paramresolver;
+package com.kiwidev.junit.extension;
 
 import com.kiwidev.junit.service.UserService;
-import com.kiwidev.junit.service.UserServiceTest;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
