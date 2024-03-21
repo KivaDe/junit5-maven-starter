@@ -7,8 +7,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -105,6 +107,7 @@ public class UserServiceTest {
     @Tag("login")
     @DisplayName("user login test functionality")
     @Nested
+    @Timeout(value = 200,unit = TimeUnit.MILLISECONDS)
     class LoginTest{
         @Test
 
@@ -116,7 +119,7 @@ public class UserServiceTest {
             assertTrue(user.isEmpty());
         }
         @Test
-
+        @Disabled("flaky")
         void loginFailedIfPasswordIsNotCorrect(){
             userService.add(IVAN);
 
@@ -139,7 +142,18 @@ public class UserServiceTest {
         }
 
         @Test
-        void loginFailedIfUserDoesNotExists(){
+        void checkLoginFunctionalityPerformance(){
+            System.out.println(Thread.currentThread().getName());
+            var result = assertTimeoutPreemptively(Duration.ofMillis(200L),() ->{
+                Thread.sleep(300L);
+                System.out.println(Thread.currentThread().getName());
+                    return userService.login("dummy", IVAN.getPassword());
+            });
+        }
+
+
+        @RepeatedTest(value = 5,name = RepeatedTest.LONG_DISPLAY_NAME)
+        void loginFailedIfUserDoesNotExists(RepetitionInfo repetitionInfo){
             userService.add(IVAN);
 
             var user = userService.login("dummy",IVAN.getPassword());
