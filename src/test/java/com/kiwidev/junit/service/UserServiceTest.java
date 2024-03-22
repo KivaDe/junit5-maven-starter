@@ -77,7 +77,7 @@ public class UserServiceTest extends TestBase {
 //        Mockito.doReturn(true).when(userDao).delete(Mockito.any());
 //        Mockito.when(userDao.delete(IVAN.getId())).thenReturn(true)
 //                .thenReturn(false);
-
+        BDDMockito.given(userDao.delete(IVAN.getId())).willReturn(true);
 
 
         var deleteResult = userService.delete(IVAN.getId());
