@@ -16,7 +16,8 @@ public class UserService {
     }
 
     public boolean delete(Integer userId){
-        return userDao.delete(userId);
+        Integer userIdLocal = 25;
+        return userDao.delete(userIdLocal);
     }
 
     public List<User> getAll(){
