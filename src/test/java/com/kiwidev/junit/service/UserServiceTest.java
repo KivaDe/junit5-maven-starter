@@ -1,18 +1,18 @@
 package com.kiwidev.junit.service;
 
 import com.kiwidev.junit.TestBase;
+import com.kiwidev.junit.dao.UserDao;
 import com.kiwidev.junit.dto.User;
 import com.kiwidev.junit.extension.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
+import org.mockito.Mockito;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.*;
         UserServiceParamResolver.class,
         PostProcessingExtension.class,
         ConditionalExtensions.class,
-        ThrowableExtension.class
+//        ThrowableExtension.class
 //        GlobalExtension.class
 })
 public class UserServiceTest extends TestBase {
@@ -34,6 +34,7 @@ public class UserServiceTest extends TestBase {
     private static final User IVAN = User.of(1,"Ivan","123");
     private static final User PETR = User.of(2,"Petr","111");
 
+    private UserDao userDao;
     private UserService userService;
 
     UserServiceTest(TestInfo testInfo){
@@ -47,9 +48,23 @@ public class UserServiceTest extends TestBase {
     }
 
     @BeforeEach
-    void prepare(UserService userService){
+    void prepare(){
         System.out.println("Before each: " + this);
-        this.userService = userService;
+        this.userDao = Mockito.mock(UserDao.class);
+        this.userService = new UserService(userDao);
+    }
+    @Test
+    void shouldDeleteExistedUser(){
+        userService.add(IVAN);
+//        Mockito.doReturn(true).when(userDao).delete(IVAN.getId());
+        Mockito.doReturn(true).when(userDao).delete(Mockito.any());
+        Mockito.when(userDao.delete(IVAN.getId())).thenReturn(true)
+                .thenReturn(false);
+        var deleteResult = userService.delete(IVAN.getId());
+        System.out.println(userService.delete(IVAN.getId()));
+        System.out.println(userService.delete(IVAN.getId()));
+
+        assertThat(deleteResult).isTrue();
     }
 
     @Test
@@ -65,7 +80,6 @@ public class UserServiceTest extends TestBase {
 
     @Test
     void usersSizeIfUserAdded(){
-        var userService = new UserService();
         userService.add(IVAN);
         userService.add(PETR);
 
